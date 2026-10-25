@@ -1,10 +1,10 @@
-import { Button } from '@/components/ui/button'
+import { Outlet } from 'react-router'
 
+/** 모든 페이지가 공유하는 레이아웃 */
 function App() {
   return (
     <main className="p-8">
-      <h1 className="text-2xl font-bold">LoaPulse</h1>
-      <Button className="mt-4">시작하기</Button>
+      <Outlet />
     </main>
   )
 }

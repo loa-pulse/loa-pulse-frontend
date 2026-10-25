@@ -23,4 +23,11 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // shadcn/ui가 생성하는 컴포넌트는 variants 같은 헬퍼를 함께 내보낸다
+    files: ['src/components/ui/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

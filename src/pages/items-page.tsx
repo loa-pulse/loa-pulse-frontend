@@ -11,6 +11,7 @@ import {
   useItems,
 } from '@/features/market/queries'
 import { PAGE_SIZE, useItemsParams } from '@/features/market/use-items-params'
+import { useRealtimeSubscription } from '@/features/realtime/realtime-context'
 import { useNow } from '@/lib/use-now'
 
 function Caption() {
@@ -41,6 +42,8 @@ function ItemsPage() {
   })
 
   const page = items.data
+  // 보이는 페이지의 아이템만 실시간으로 받는다 (05-api "연결")
+  useRealtimeSubscription({ items: page?.content.map((i) => i.id) })
   const categoryName =
     categories.data?.find((c) => c.code === params.category)?.name ?? '전체'
 

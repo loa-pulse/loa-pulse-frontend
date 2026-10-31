@@ -1,13 +1,11 @@
 import { createBrowserRouter } from 'react-router'
 import App from '@/App'
-import AlertsPage from '@/pages/alerts-page'
-import HomePage from '@/pages/home-page'
-import ItemDetailPage from '@/pages/item-detail-page'
-import ItemsPage from '@/pages/items-page'
-import NotFoundPage from '@/pages/not-found-page'
 import RouteErrorPage from '@/pages/route-error-page'
-import SettingsPage from '@/pages/settings-page'
-import StatusPage from '@/pages/status-page'
+
+/** 페이지는 그 경로에 처음 들어갈 때 불러온다. 차트 라이브러리처럼 큰 의존성이 첫 화면에 실리지 않는다 */
+function page(load: () => Promise<{ default: React.ComponentType }>) {
+  return async () => ({ Component: (await load()).default })
+}
 
 export const router = createBrowserRouter([
   {
@@ -15,13 +13,16 @@ export const router = createBrowserRouter([
     Component: App,
     ErrorBoundary: RouteErrorPage,
     children: [
-      { index: true, Component: HomePage },
-      { path: 'items', Component: ItemsPage },
-      { path: 'items/:itemId', Component: ItemDetailPage },
-      { path: 'alerts', Component: AlertsPage },
-      { path: 'settings', Component: SettingsPage },
-      { path: 'status', Component: StatusPage },
-      { path: '*', Component: NotFoundPage },
+      { index: true, lazy: page(() => import('@/pages/home-page')) },
+      { path: 'items', lazy: page(() => import('@/pages/items-page')) },
+      {
+        path: 'items/:itemId',
+        lazy: page(() => import('@/pages/item-detail-page')),
+      },
+      { path: 'alerts', lazy: page(() => import('@/pages/alerts-page')) },
+      { path: 'settings', lazy: page(() => import('@/pages/settings-page')) },
+      { path: 'status', lazy: page(() => import('@/pages/status-page')) },
+      { path: '*', lazy: page(() => import('@/pages/not-found-page')) },
     ],
   },
 ])

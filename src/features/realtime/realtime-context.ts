@@ -18,10 +18,18 @@ export type RealtimeContextValue = {
 
 export const RealtimeContext = createContext<RealtimeContextValue | null>(null)
 
+/**
+ * Provider 밖(화면 단위 컴포넌트 테스트)에서는 연결 없이 동작한다.
+ * 실시간 연결 자체는 stream-connection, cache-updates 테스트에서 따로 검증한다.
+ */
+const withoutProvider: RealtimeContextValue = {
+  state: 'connecting',
+  serviceStatus: 'NORMAL',
+  subscribe: () => () => {},
+}
+
 function useRealtimeContext() {
-  const value = useContext(RealtimeContext)
-  if (!value) throw new Error('RealtimeProvider 안에서만 쓸 수 있다')
-  return value
+  return useContext(RealtimeContext) ?? withoutProvider
 }
 
 /** 실시간 연결 상태와 서비스 상태 */

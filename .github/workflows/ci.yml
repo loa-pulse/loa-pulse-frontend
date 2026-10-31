@@ -25,5 +25,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      - run: pnpm test
       # 타입 검사(tsc -b)와 번들 빌드
       - run: pnpm build

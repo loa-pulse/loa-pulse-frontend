@@ -2,12 +2,34 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/geist';
+@import '@fontsource-variable/noto-sans-kr';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  /* 숫자·영문은 Geist, Geist에 없는 한글은 Noto Sans KR로 떨어진다 */
+  --font-sans: 'Geist Variable', 'Noto Sans KR Variable', sans-serif;
+  /* LoaPulse 토큰 (Figma Foundations와 같은 이름) */
+  --color-price-rise: var(--price-rise);
+  --color-price-rise-subtle: var(--price-rise-subtle);
+  --color-price-fall: var(--price-fall);
+  --color-price-fall-subtle: var(--price-fall-subtle);
+  --color-price-flat: var(--price-flat);
+  --color-status-live: var(--status-live);
+  --color-status-live-subtle: var(--status-live-subtle);
+  --color-status-warning: var(--status-warning);
+  --color-status-warning-subtle: var(--status-warning-subtle);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-discord: var(--brand-discord);
+  --color-grade-common: var(--grade-common);
+  --color-grade-uncommon: var(--grade-uncommon);
+  --color-grade-rare: var(--grade-rare);
+  --color-grade-epic: var(--grade-epic);
+  --color-grade-legendary: var(--grade-legendary);
+  --color-grade-relic: var(--grade-relic);
+  --color-grade-ancient: var(--grade-ancient);
+  --color-grade-esther: var(--grade-esther);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -81,6 +103,30 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* 테마와 무관한 LoaPulse 색. 상승은 빨강, 하락은 파랑 (한국 관례) */
+:root {
+  --price-rise: #f2545b;
+  --price-rise-subtle: #3a1a1c;
+  --price-fall: #4c8df6;
+  --price-fall-subtle: #16243d;
+  --price-flat: #a1a1a1;
+  --status-live: #22c55e;
+  --status-live-subtle: #11291a;
+  --status-warning: #f5a524;
+  --status-warning-subtle: #33260f;
+  --brand-gold: #e8b95a;
+  --brand-discord: #5865f2;
+  /* 로스트아크 아이템 등급 */
+  --grade-common: #b8b8b8;
+  --grade-uncommon: #8dd13a;
+  --grade-rare: #3a9be0;
+  --grade-epic: #a54ce0;
+  --grade-legendary: #e59a21;
+  --grade-relic: #e05a21;
+  --grade-ancient: #d9c08c;
+  --grade-esther: #3fd1c9;
 }
 
 .dark {

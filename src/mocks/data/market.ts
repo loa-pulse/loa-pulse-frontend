@@ -8,6 +8,8 @@ import type {
   ItemPrices,
   ItemSummary,
   PricePoint,
+  RankingEntry,
+  Rankings,
 } from '@/api/schema'
 
 /**
@@ -243,6 +245,38 @@ export function toDailyPrices(
     })
   }
   return { itemId: seed.id, days: result }
+}
+
+/** 1시간 변동률로 상승·하락 TOP 10. 값이 없는 아이템(수집 1시간 미만)은 빠진다 */
+export function rankings(now: Date): Rankings {
+  const entries = SEED.map((s) => toSummary(s, now)).filter(
+    (s) => s.changeRate1h !== null,
+  )
+  const toEntry = (s: ItemSummary, i: number): RankingEntry => ({
+    rank: i + 1,
+    item: {
+      id: s.id,
+      name: s.name,
+      grade: s.grade,
+      categoryName: s.categoryName,
+      iconUrl: s.iconUrl,
+    },
+    currentPrice: s.currentPrice,
+    changeRate1h: s.changeRate1h!,
+  })
+  return {
+    rising: entries
+      .filter((s) => s.changeRate1h! > 0)
+      .sort((a, b) => b.changeRate1h! - a.changeRate1h!)
+      .slice(0, 10)
+      .map(toEntry),
+    falling: entries
+      .filter((s) => s.changeRate1h! < 0)
+      .sort((a, b) => a.changeRate1h! - b.changeRate1h!)
+      .slice(0, 10)
+      .map(toEntry),
+    calculatedAt: secondsAgo(now, 5),
+  }
 }
 
 export function collectionSummary(now: Date): CollectionSummary {

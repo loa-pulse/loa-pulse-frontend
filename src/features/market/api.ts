@@ -9,6 +9,7 @@ import type {
   ItemSort,
   ItemSummary,
   Page,
+  Rankings,
 } from '@/api/schema'
 
 /** 시세 조회 API (05-api.md M1) */
@@ -40,6 +41,9 @@ export const marketApi = {
       { days },
       signal,
     ),
+
+  rankings: (signal?: AbortSignal) =>
+    apiGet<Rankings>('/api/rankings', undefined, signal),
 
   collectionSummary: (signal?: AbortSignal) =>
     apiGet<CollectionSummary>('/api/collection/summary', undefined, signal),

@@ -5,6 +5,7 @@ import {
   collectionSummary,
   findSeed,
   itemsInCategory,
+  rankings,
   toDailyPrices,
   toDetail,
   toPrices,
@@ -87,6 +88,8 @@ export const marketHandlers = [
     )
     return HttpResponse.json(toDailyPrices(seed, new Date(), days))
   }),
+
+  http.get(api('/rankings'), () => HttpResponse.json(rankings(new Date()))),
 
   http.get(api('/collection/summary'), () =>
     HttpResponse.json(collectionSummary(new Date())),

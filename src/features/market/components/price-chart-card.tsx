@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { formatGold } from '@/lib/format/number'
+import { cn } from '@/lib/utils'
 import { dailyPoints, intradayPoints, trendTone } from '../chart-data'
 import { useDailyPrices, usePrices } from '../queries'
 
@@ -54,6 +55,7 @@ export function PriceChartCard({ itemId, itemName }: PriceChartCardProps) {
         : null,
     [range, yesterdayAvg],
   )
+  const tone = trendTone(points, baseline?.price)
 
   return (
     <section
@@ -82,7 +84,7 @@ export function PriceChartCard({ itemId, itemName }: PriceChartCardProps) {
         <PriceChart
           points={points}
           baseline={baseline}
-          tone={trendTone(points)}
+          tone={tone}
           showTime={range === 'today'}
           height={CHART_HEIGHT}
           ariaLabel={`${itemName} ${range === 'today' ? '오늘 분 단위 최저가' : '최근 2주 일별 평균가'} 차트`}
@@ -91,7 +93,13 @@ export function PriceChartCard({ itemId, itemName }: PriceChartCardProps) {
 
       <div className="flex items-center gap-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span aria-hidden="true" className="h-0.5 w-3.5 bg-price-rise" />
+          <span
+            aria-hidden="true"
+            className={cn(
+              'h-0.5 w-3.5',
+              tone === 'rise' ? 'bg-price-rise' : 'bg-price-fall',
+            )}
+          />
           {range === 'today' ? '최저가' : '일별 평균가'}
         </span>
         {baseline && (

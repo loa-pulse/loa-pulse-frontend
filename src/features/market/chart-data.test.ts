@@ -39,5 +39,11 @@ describe('trendTone', () => {
     expect(trendTone([at(10), at(8)])).toBe('fall')
     expect(trendTone([at(10), at(10)])).toBe('rise')
     expect(trendTone([at(10)])).toBe('rise')
+    expect(trendTone([])).toBe('rise')
+  })
+
+  it('기준값이 있으면 마지막 값을 기준값과 비교한다 (전일 대비와 같은 색)', () => {
+    expect(trendTone([at(5), at(9)], 10)).toBe('fall')
+    expect(trendTone([at(12), at(11)], 10)).toBe('rise')
   })
 })

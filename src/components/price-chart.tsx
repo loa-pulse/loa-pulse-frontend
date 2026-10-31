@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import {
   AreaSeries,
   createChart,
+  type AutoscaleInfo,
   LineStyle,
   type IChartApi,
   type ISeriesApi,
@@ -106,6 +107,20 @@ export function PriceChart({
       timeScale: { timeVisible: showTime, secondsVisible: false },
     })
     series.setData(points)
+    // 기준선이 데이터 범위 밖이어도 보이도록 세로 범위에 넣는다
+    series.applyOptions({
+      autoscaleInfoProvider: (original: () => AutoscaleInfo | null) => {
+        const info = original()
+        if (!info?.priceRange || !baseline) return info
+        return {
+          ...info,
+          priceRange: {
+            minValue: Math.min(info.priceRange.minValue, baseline.price),
+            maxValue: Math.max(info.priceRange.maxValue, baseline.price),
+          },
+        }
+      },
+    })
 
     if (baselineRef.current) series.removePriceLine(baselineRef.current)
     baselineRef.current = baseline

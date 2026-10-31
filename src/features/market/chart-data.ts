@@ -23,8 +23,16 @@ export function dailyPoints(days: DailyPrice[]): ChartPoint[] {
   })
 }
 
-/** 선 색: 처음보다 끝이 낮으면 하락(파랑), 아니면 상승(빨강) */
-export function trendTone(points: ChartPoint[]): 'rise' | 'fall' {
-  if (points.length < 2) return 'rise'
-  return points.at(-1)!.value < points[0].value ? 'fall' : 'rise'
+/**
+ * 선 색. 기준값(전일 평균가)이 있으면 마지막 값을 기준값과 비교해 위 배지의 전일 대비와 맞춘다.
+ * 없으면 처음과 끝을 비교한다. 낮으면 하락(파랑), 아니면 상승(빨강)
+ */
+export function trendTone(
+  points: ChartPoint[],
+  reference?: number | null,
+): 'rise' | 'fall' {
+  const last = points.at(-1)
+  if (!last) return 'rise'
+  const base = reference ?? points[0].value
+  return last.value < base ? 'fall' : 'rise'
 }

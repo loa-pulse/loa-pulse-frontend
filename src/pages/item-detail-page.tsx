@@ -8,6 +8,8 @@ import { PriceCard } from '@/features/market/components/price-card'
 import { PriceChartCard } from '@/features/market/components/price-chart-card'
 import { itemCaption } from '@/features/market/item-display'
 import { useItem } from '@/features/market/queries'
+import { RealtimeIndicator } from '@/features/realtime/components/realtime-indicator'
+import { useRealtimeSubscription } from '@/features/realtime/realtime-context'
 import { useNow } from '@/lib/use-now'
 
 function DetailSkeleton() {
@@ -36,6 +38,7 @@ function ItemDetailPage() {
   const itemId = Number(useParams().itemId)
   const now = useNow()
   const item = useItem(itemId)
+  useRealtimeSubscription({ items: item.data ? [itemId] : [] })
 
   return (
     <>
@@ -100,7 +103,13 @@ function ItemDetailPage() {
 
             <div className="flex items-start gap-6">
               <div className="flex min-w-0 flex-1 flex-col gap-6">
-                <PriceCard item={item.data} now={now} />
+                <PriceCard
+                  item={item.data}
+                  now={now}
+                  liveIndicator={
+                    <RealtimeIndicator liveLabel="실시간 반영 중" />
+                  }
+                />
                 <PriceChartCard itemId={itemId} itemName={item.data.name} />
               </div>
               <aside className="flex w-[360px] shrink-0 flex-col gap-6">

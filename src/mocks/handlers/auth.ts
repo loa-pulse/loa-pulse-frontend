@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { mockAccount, mockMe } from '../data/account'
+import { mockAlerts } from '../data/alerts'
 import { guard, issueCsrfCookie } from './guards'
 
 /**
@@ -9,7 +10,7 @@ import { guard, issueCsrfCookie } from './guards'
 export const authHandlers = [
   http.get('*/api/me', ({ request }) => {
     issueCsrfCookie()
-    return guard(request) ?? HttpResponse.json(mockMe(0))
+    return guard(request) ?? HttpResponse.json(mockMe(mockAlerts.activeCount()))
   }),
 
   http.post('*/api/auth/logout', ({ request }) => {

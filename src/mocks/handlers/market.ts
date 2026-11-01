@@ -11,6 +11,7 @@ import {
   toPrices,
   toSummary,
 } from '../data/market'
+import { mockWatch } from '../data/watch'
 
 /** VITE_API_BASE_URL이 있어도 맞도록 출처와 상관없이 경로로 찾는다 */
 const api = (path: string) => `*/api${path}`
@@ -53,7 +54,7 @@ export const marketHandlers = [
 
     let items = itemsInCategory(category)
       .filter((s) => !q || s.name.includes(q))
-      .map((s) => toSummary(s, now))
+      .map((s) => ({ ...toSummary(s, now), watched: mockWatch.has(s.id) }))
     const sorter = sorters[sort]
     if (sorter) items = [...items].sort(sorter)
 
@@ -70,7 +71,10 @@ export const marketHandlers = [
   http.get(api('/items/:itemId'), ({ params }) => {
     const seed = findSeed(Number(params.itemId))
     if (!seed) return notFound('아이템을 찾을 수 없습니다.')
-    return HttpResponse.json(toDetail(seed, new Date()))
+    return HttpResponse.json({
+      ...toDetail(seed, new Date()),
+      watched: mockWatch.has(seed.id),
+    })
   }),
 
   http.get(api('/items/:itemId/prices'), ({ params }) => {

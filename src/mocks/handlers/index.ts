@@ -2,6 +2,7 @@ import type { RequestHandler } from 'msw'
 import { alertHandlers } from './alerts'
 import { authHandlers } from './auth'
 import { marketHandlers } from './market'
+import { watchHandlers } from './watch'
 
 /**
  * 백엔드 API 목업 핸들러 (design/05-api.md 계약).
@@ -12,4 +13,5 @@ export const handlers: RequestHandler[] = [
   ...marketHandlers,
   ...authHandlers,
   ...alertHandlers,
+  ...watchHandlers,
 ]

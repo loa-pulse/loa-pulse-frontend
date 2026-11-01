@@ -2,6 +2,7 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
+import { mockAccount } from '@/mocks/data/account'
 import { server } from '@/mocks/server'
 import { renderWithProviders } from '@/test/render'
 import HomePage from './home-page'
@@ -68,5 +69,33 @@ describe('메인 화면', () => {
     expect(
       await screen.findByRole('region', { name: '급상승 TOP 10' }),
     ).toBeInTheDocument()
+  })
+})
+
+describe('메인의 내 관심 아이템', () => {
+  it('로그인하지 않았으면 보여주지 않는다', async () => {
+    renderWithProviders(<HomePage />)
+    await screen.findByRole('region', { name: '급상승 TOP 10' })
+    expect(
+      screen.queryByRole('region', { name: /내 관심 아이템/ }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('로그인했으면 관심 아이템 카드와 추가 카드를 보여준다', async () => {
+    mockAccount.logIn()
+    renderWithProviders(<HomePage />)
+
+    const section = await screen.findByRole('region', {
+      name: /내 관심 아이템/,
+    })
+    const card = await within(section).findByRole('link', {
+      name: /운명의 파괴석 결정/,
+    })
+    expect(card).toHaveAttribute('href', '/items/66102007')
+    expect(card).toHaveTextContent('829 G')
+    expect(within(section).getByText('4개')).toBeInTheDocument()
+    expect(
+      within(section).getByRole('link', { name: /관심 아이템 추가/ }),
+    ).toHaveAttribute('href', '/items')
   })
 })

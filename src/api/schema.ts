@@ -106,6 +106,28 @@ export type ItemDailyPrices = {
   days: DailyPrice[]
 }
 
+/** 랭킹의 한 줄. 아이템 등급은 05-api 요약에 없지만 썸네일의 등급 색에 필요해 더했다 */
+export type RankingEntry = {
+  rank: number
+  item: {
+    id: number
+    name: string
+    grade: string
+    categoryName: string
+    iconUrl: string | null
+  }
+  currentPrice: number
+  /** 최근 1시간 변동률(%) */
+  changeRate1h: number
+}
+
+/** GET /api/rankings, SSE ranking 이벤트 (30초마다 계산, D12) */
+export type Rankings = {
+  rising: RankingEntry[]
+  falling: RankingEntry[]
+  calculatedAt: string
+}
+
 export type ServiceStatus = 'NORMAL' | 'DELAYED' | 'MAINTENANCE'
 
 /** GET /api/collection/summary (수집 신선도 띠) */

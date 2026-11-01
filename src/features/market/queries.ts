@@ -13,8 +13,16 @@ export const marketKeys = {
   prices: (itemId: number) => [...marketKeys.item(itemId), 'prices'] as const,
   dailyPrices: (itemId: number, days: number) =>
     [...marketKeys.item(itemId), 'daily', days] as const,
+  rankings: () => [...marketKeys.all, 'rankings'] as const,
   collectionSummary: () => [...marketKeys.all, 'collection-summary'] as const,
 }
+
+/** 첫 화면용. 이후에는 SSE ranking 이벤트가 캐시를 바꾼다 */
+export const rankingsQuery = () =>
+  queryOptions({
+    queryKey: marketKeys.rankings(),
+    queryFn: ({ signal }) => marketApi.rankings(signal),
+  })
 
 export const categoriesQuery = () =>
   queryOptions({
@@ -64,4 +72,5 @@ export const useItem = (itemId: number) => useQuery(itemQuery(itemId))
 export const usePrices = (itemId: number) => useQuery(pricesQuery(itemId))
 export const useDailyPrices = (itemId: number, days?: number) =>
   useQuery(dailyPricesQuery(itemId, days))
+export const useRankings = () => useQuery(rankingsQuery())
 export const useCollectionSummary = () => useQuery(collectionSummaryQuery())

@@ -9,10 +9,20 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import type { ServiceStatus } from '@/api/schema'
 import { apiUrl } from '@/api/client'
-import { applyFreshnessEvent, applyPriceEvent } from './cache-updates'
+import {
+  applyFreshnessEvent,
+  applyPriceEvent,
+  applyRankingEvent,
+} from './cache-updates'
+import type { StreamEventMap, StreamEventType } from './events'
 import { RealtimeContext, type Subscription } from './realtime-context'
 import { createStreamConnection, type StreamState } from './stream-connection'
 import { useTabActive } from './use-tab-active'
+
+/** 이벤트 이름과 데이터 형식을 묶은 구분 유니온. switch에서 data 타입이 좁혀진다 */
+type AnyStreamEvent = {
+  [K in StreamEventType]: { type: K; data: StreamEventMap[K] }
+}[StreamEventType]
 
 /** 서버가 한 연결에서 받는 아이템 수 상한 (05-api "연결") */
 const MAX_ITEMS = 50
@@ -60,12 +70,18 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
       url,
       onStateChange: setState,
       onEvent: (type, data) => {
-        if (type === 'price') {
-          applyPriceEvent(queryClient, data as never)
-        } else if (type === 'freshness') {
-          const event = data as Parameters<typeof applyFreshnessEvent>[1]
-          applyFreshnessEvent(queryClient, event)
-          setServiceStatus(event.serviceStatus)
+        const event = { type, data } as AnyStreamEvent
+        switch (event.type) {
+          case 'price':
+            applyPriceEvent(queryClient, event.data)
+            break
+          case 'freshness':
+            applyFreshnessEvent(queryClient, event.data)
+            setServiceStatus(event.data.serviceStatus)
+            break
+          case 'ranking':
+            applyRankingEvent(queryClient, event.data)
+            break
         }
       },
     })

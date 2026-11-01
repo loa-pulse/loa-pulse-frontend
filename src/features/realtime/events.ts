@@ -1,4 +1,4 @@
-import type { ServiceStatus } from '@/api/schema'
+import type { Rankings, ServiceStatus } from '@/api/schema'
 
 /**
  * SSE 이벤트 (loa-pulse-docs design/05-api.md "SSE").
@@ -22,11 +22,19 @@ export type FreshnessEvent = {
   sentAt: string
 }
 
+/** 랭킹을 구독했고 결과가 바뀌었을 때. GET /api/rankings와 같은 형식 (D12) */
+export type RankingEvent = Rankings
+
 export type StreamEventMap = {
   price: PriceEvent
   freshness: FreshnessEvent
+  ranking: RankingEvent
 }
 
 export type StreamEventType = keyof StreamEventMap
 
-export const STREAM_EVENT_TYPES: StreamEventType[] = ['price', 'freshness']
+export const STREAM_EVENT_TYPES: StreamEventType[] = [
+  'price',
+  'freshness',
+  'ranking',
+]

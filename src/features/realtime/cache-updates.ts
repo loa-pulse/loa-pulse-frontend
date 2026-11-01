@@ -1,7 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
 import type { ItemDetail, ItemPrices, ItemSummary, Page } from '@/api/schema'
 import { marketKeys } from '@/features/market/queries'
-import type { FreshnessEvent, PriceEvent } from './events'
+import type { FreshnessEvent, PriceEvent, RankingEvent } from './events'
 
 /** 목록 쿼리(탭·검색·페이지별로 여러 개)의 해당 행을 모두 바꾼다 */
 function updateListRows(
@@ -69,6 +69,18 @@ export function applyPriceEvent(queryClient: QueryClient, event: PriceEvent) {
     marketKeys.prices(event.itemId),
     (prices) =>
       prices && appendPoint(prices, event.collectedAt, event.currentPrice),
+  )
+}
+
+/** ranking 이벤트: 랭킹 전체를 바꾼다. 더 오래된 계산 결과는 무시한다 */
+export function applyRankingEvent(
+  queryClient: QueryClient,
+  event: RankingEvent,
+) {
+  queryClient.setQueryData<RankingEvent>(marketKeys.rankings(), (current) =>
+    current && !newer(event.calculatedAt, current.calculatedAt)
+      ? current
+      : event,
   )
 }
 

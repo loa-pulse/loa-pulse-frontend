@@ -3,7 +3,7 @@ import type { WatchItem } from '@/api/schema'
 import { ItemThumb } from '@/components/item-thumb'
 import { PriceChange } from '@/components/price-change'
 import { Sparkline } from '@/components/sparkline'
-import { formatGold } from '@/lib/format/number'
+import { changeDirection, formatGold } from '@/lib/format/number'
 
 /** 메인의 관심 아이템 카드 (Figma "내 관심 아이템"). 카드 전체가 상세 링크다 */
 export function WatchItemCard({ watch }: { watch: WatchItem }) {
@@ -34,7 +34,14 @@ export function WatchItemCard({ watch }: { watch: WatchItem }) {
           </span>
           <PriceChange rate={watch.changeRate} />
         </span>
-        <Sparkline points={watch.todayPoints} />
+        <Sparkline
+          points={watch.todayPoints}
+          direction={
+            watch.changeRate === null
+              ? undefined
+              : changeDirection(watch.changeRate)
+          }
+        />
       </Link>
     </li>
   )

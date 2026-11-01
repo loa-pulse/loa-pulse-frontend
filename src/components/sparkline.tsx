@@ -1,4 +1,5 @@
 import type { PricePoint } from '@/api/schema'
+import type { ChangeDirection } from '@/lib/format/number'
 import { cn } from '@/lib/utils'
 
 const WIDTH = 160
@@ -6,14 +7,22 @@ const HEIGHT = 32
 
 type SparklineProps = {
   points: PricePoint[]
+  /** 선 색. 옆의 등락률 배지와 같은 기준(전일 대비)을 넘긴다. 없으면 처음 점과 비교한다 */
+  direction?: ChangeDirection
   className?: string
 }
 
+const tones: Record<ChangeDirection, string> = {
+  rise: 'text-price-rise',
+  fall: 'text-price-fall',
+  flat: 'text-price-flat',
+}
+
 /**
- * 작은 추이 선 (Figma 관심 아이템 카드). 처음보다 오르면 빨강, 내리면 파랑.
+ * 작은 추이 선 (Figma 관심 아이템 카드). 오르면 빨강, 내리면 파랑.
  * 값을 읽게 하려는 그림이 아니므로 스크린 리더에는 숨긴다 (카드에 현재가와 변동률이 글자로 있다).
  */
-export function Sparkline({ points, className }: SparklineProps) {
+export function Sparkline({ points, direction, className }: SparklineProps) {
   if (points.length < 2) return <div className={cn('h-8', className)} />
 
   const prices = points.map((p) => p.price)
@@ -31,11 +40,10 @@ export function Sparkline({ points, className }: SparklineProps) {
     .join(' ')
   const last = prices[prices.length - 1]
   const tone =
-    last > prices[0]
-      ? 'text-price-rise'
-      : last < prices[0]
-        ? 'text-price-fall'
-        : 'text-price-flat'
+    tones[
+      direction ??
+        (last > prices[0] ? 'rise' : last < prices[0] ? 'fall' : 'flat')
+    ]
 
   return (
     <svg

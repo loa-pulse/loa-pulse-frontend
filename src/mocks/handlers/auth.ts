@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import type { DmTestResult, SettingsRequest } from '@/api/schema'
 import { issueCsrfCookie, mockAccount, mockMe } from '../data/account'
 import { mockAlerts } from '../data/alerts'
+import { mockWatch } from '../data/watch'
 import { guard } from './guards'
 
 /**
@@ -50,6 +51,7 @@ export const authHandlers = [
     if (denied) return denied
     mockAccount.reset()
     mockAlerts.reset()
+    mockWatch.reset()
     return new HttpResponse(null, { status: 204 })
   }),
 ]

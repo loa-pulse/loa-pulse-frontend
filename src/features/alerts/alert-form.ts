@@ -53,7 +53,13 @@ export function defaultAlertValues(
     channels: AlertChannels
   },
 ): AlertFormValues {
-  if (initial) return { ...initial, threshold: String(initial.threshold) }
+  if (initial) {
+    return {
+      direction: initial.direction,
+      threshold: String(initial.threshold),
+      channels: { ...initial.channels },
+    }
+  }
   return {
     direction: 'BELOW',
     threshold: currentPrice ? String(Math.round(currentPrice * 0.95)) : '',

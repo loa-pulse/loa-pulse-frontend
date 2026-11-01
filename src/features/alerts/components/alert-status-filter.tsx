@@ -27,8 +27,7 @@ export function AlertStatusFilter({
         {/* Figma처럼 고른 필터만 배경을 둔다 */}
         {FILTERS.map((f) => (
           <TabsTrigger key={f.value} value={f.value}>
-            {f.label}
-            {counts && <span className="tabular-nums">{counts[f.count]}</span>}
+            {counts ? `${f.label} ${counts[f.count]}` : f.label}
           </TabsTrigger>
         ))}
       </TabsList>

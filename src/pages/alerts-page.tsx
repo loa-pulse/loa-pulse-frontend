@@ -1,3 +1,4 @@
+import { AlertRowActions } from '@/features/alerts/components/alert-row-actions'
 import { AlertUsage } from '@/features/alerts/components/alert-usage'
 import { RegisteredAlerts } from '@/features/alerts/components/registered-alerts'
 import { RequireLogin } from '@/features/auth/components/require-login'
@@ -26,7 +27,11 @@ function AlertsPage() {
           )}
         </div>
         <RequireLogin description="로그인하면 등록한 알림과 받은 알림 내역을 볼 수 있어요">
-          {() => <RegisteredAlerts />}
+          {() => (
+            <RegisteredAlerts
+              renderActions={(alert) => <AlertRowActions alert={alert} />}
+            />
+          )}
         </RequireLogin>
       </div>
     </>

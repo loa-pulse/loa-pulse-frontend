@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
-import { mockAccount, mockMe } from '../data/account'
-import { guard, issueCsrfCookie } from './guards'
+import { issueCsrfCookie, mockAccount, mockMe } from '../data/account'
+import { mockAlerts } from '../data/alerts'
+import { guard } from './guards'
 
 /**
  * 계정 목업 (05-api M3). 디스코드 로그인 이동(`/api/auth/login`)은 페이지 이동이라
@@ -9,7 +10,7 @@ import { guard, issueCsrfCookie } from './guards'
 export const authHandlers = [
   http.get('*/api/me', ({ request }) => {
     issueCsrfCookie()
-    return guard(request) ?? HttpResponse.json(mockMe(0))
+    return guard(request) ?? HttpResponse.json(mockMe(mockAlerts.activeCount()))
   }),
 
   http.post('*/api/auth/logout', ({ request }) => {

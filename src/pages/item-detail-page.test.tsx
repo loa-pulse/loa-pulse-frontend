@@ -2,6 +2,8 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
+import { LoginPromptProvider } from '@/features/auth/login-prompt-provider'
+import { mockAccount } from '@/mocks/data/account'
 import { renderWithProviders } from '@/test/render'
 import ItemDetailPage from './item-detail-page'
 
@@ -65,5 +67,60 @@ describe('아이템 상세 화면', () => {
     expect(
       screen.getByRole('link', { name: '시세 목록 보기' }),
     ).toHaveAttribute('href', '/items')
+  })
+})
+
+describe('아이템 상세의 알림', () => {
+  function renderWithPrompt(route = '/items/66102007') {
+    return renderWithProviders(
+      <LoginPromptProvider>
+        <Routes>
+          <Route path="/items/:itemId" element={<ItemDetailPage />} />
+        </Routes>
+      </LoginPromptProvider>,
+      { route },
+    )
+  }
+
+  it('로그인하지 않았으면 알림 설정이 로그인 안내를 연다', async () => {
+    renderWithPrompt()
+    await userEvent.click(
+      await screen.findByRole('button', { name: '알림 설정' }),
+    )
+
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog).toHaveTextContent(
+      '로그인하면 운명의 파괴석 결정 화면으로 돌아와 알림 설정이 열려요',
+    )
+  })
+
+  it('로그인했으면 이 아이템의 알림을 보여주고, 모달에서 등록하면 목록에 더한다', async () => {
+    mockAccount.logIn()
+    renderWithPrompt()
+
+    const card = await screen.findByRole('region', { name: '이 아이템 알림' })
+    expect(await within(card).findByText('790 G 이하')).toBeInTheDocument()
+
+    await userEvent.click(
+      within(card).getByRole('button', { name: /새 알림 추가/ }),
+    )
+    const dialog = await screen.findByRole('dialog', { name: '목표가 알림' })
+    const input = within(dialog).getByRole('textbox', { name: '기준가' })
+    await userEvent.clear(input)
+    await userEvent.type(input, '700')
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: '알림 등록' }),
+    )
+
+    expect(await within(card).findByText('700 G 이하')).toBeInTheDocument()
+  })
+
+  it('로그인하고 돌아오면(?alert=new) 모달이 열린 채로 시작한다', async () => {
+    mockAccount.logIn()
+    renderWithPrompt('/items/66102007?alert=new')
+
+    expect(
+      await screen.findByRole('dialog', { name: '목표가 알림' }),
+    ).toBeInTheDocument()
   })
 })

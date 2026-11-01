@@ -1,8 +1,12 @@
 import { Link, useParams } from 'react-router'
-import { ChevronLeftIcon } from 'lucide-react'
+import { BellIcon, ChevronLeftIcon } from 'lucide-react'
 import { ItemThumb } from '@/components/item-thumb'
 import { QueryError } from '@/components/query-error'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { AlertFormDialog } from '@/features/alerts/components/alert-form-dialog'
+import { ItemAlertsCard } from '@/features/alerts/components/item-alerts-card'
+import { useAlertDialog } from '@/features/alerts/use-alert-dialog'
 import { DailyPriceTable } from '@/features/market/components/daily-price-table'
 import { PriceCard } from '@/features/market/components/price-card'
 import { PriceChartCard } from '@/features/market/components/price-chart-card'
@@ -38,6 +42,7 @@ function ItemDetailPage() {
   const itemId = Number(useParams().itemId)
   const now = useNow()
   const item = useItem(itemId)
+  const alertDialog = useAlertDialog(item.data?.name ?? '이 아이템')
   useRealtimeSubscription({ items: item.data ? [itemId] : [] })
 
   return (
@@ -99,6 +104,16 @@ function ItemDetailPage() {
                   {item.data.grade}
                 </p>
               </div>
+              <div className="ml-auto flex gap-2">
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={alertDialog.launch}
+                >
+                  <BellIcon aria-hidden="true" />
+                  알림 설정
+                </Button>
+              </div>
             </div>
 
             <div className="flex items-start gap-6">
@@ -113,9 +128,15 @@ function ItemDetailPage() {
                 <PriceChartCard itemId={itemId} itemName={item.data.name} />
               </div>
               <aside className="flex w-[360px] shrink-0 flex-col gap-6">
+                <ItemAlertsCard itemId={itemId} onAdd={alertDialog.launch} />
                 <DailyPriceTable itemId={itemId} />
               </aside>
             </div>
+            <AlertFormDialog
+              open={alertDialog.open}
+              onOpenChange={alertDialog.setOpen}
+              item={item.data}
+            />
           </>
         )}
       </div>

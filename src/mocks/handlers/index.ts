@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'msw'
+import { alertHandlers } from './alerts'
 import { authHandlers } from './auth'
 import { marketHandlers } from './market'
 
@@ -7,4 +8,8 @@ import { marketHandlers } from './market'
  * 개발 서버(VITE_USE_MOCK), Vercel 프리뷰, 테스트가 같은 핸들러를 쓴다.
  * 백엔드가 준비되면 VITE_USE_MOCK을 끄기만 하면 된다.
  */
-export const handlers: RequestHandler[] = [...marketHandlers, ...authHandlers]
+export const handlers: RequestHandler[] = [
+  ...marketHandlers,
+  ...authHandlers,
+  ...alertHandlers,
+]

@@ -1,5 +1,5 @@
 import { HttpResponse } from 'msw'
-import { CSRF_COOKIE, CSRF_HEADER, readCsrfToken } from '@/api/csrf'
+import { CSRF_HEADER } from '@/api/csrf'
 import { MOCK_CSRF_TOKEN, mockAccount } from '../data/account'
 
 /** 실제 백엔드와 같은 ProblemDetail 오류 (05-api "오류") */
@@ -15,13 +15,6 @@ export function problem(status: number, detail: string, code?: string) {
     { type: 'about:blank', title: titles[status], status, detail, code },
     { status, headers: { 'Content-Type': 'application/problem+json' } },
   )
-}
-
-/** Spring Security처럼 응답할 때 XSRF-TOKEN 쿠키를 내려준다 */
-export function issueCsrfCookie() {
-  if (readCsrfToken() !== MOCK_CSRF_TOKEN) {
-    document.cookie = `${CSRF_COOKIE}=${MOCK_CSRF_TOKEN}; path=/`
-  }
 }
 
 /**

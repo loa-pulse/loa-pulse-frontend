@@ -1,4 +1,5 @@
 import { env } from '@/lib/env'
+import { CSRF_HEADER, needsCsrf, readCsrfToken } from './csrf'
 
 /** RFC 9457 ProblemDetail + 프론트엔드가 분기할 `code` (05-api.md "오류") */
 export type ProblemDetail = {
@@ -75,6 +76,7 @@ export async function apiRequest<T>(
   path: string,
   { query, body, signal }: RequestOptions = {},
 ): Promise<T> {
+  const csrfToken = needsCsrf(method) ? readCsrfToken() : null
   let response: Response
   try {
     response = await fetch(apiUrl(path, query), {
@@ -85,6 +87,7 @@ export async function apiRequest<T>(
       headers: {
         Accept: 'application/json',
         ...(body !== undefined && { 'Content-Type': 'application/json' }),
+        ...(csrfToken && { [CSRF_HEADER]: csrfToken }),
       },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })

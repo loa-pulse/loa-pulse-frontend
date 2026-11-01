@@ -2,6 +2,7 @@ import type { RequestHandler } from 'msw'
 import { alertHandlers } from './alerts'
 import { authHandlers } from './auth'
 import { marketHandlers } from './market'
+import { statusHandlers } from './status'
 import { watchHandlers } from './watch'
 
 /**
@@ -14,4 +15,5 @@ export const handlers: RequestHandler[] = [
   ...authHandlers,
   ...alertHandlers,
   ...watchHandlers,
+  ...statusHandlers,
 ]

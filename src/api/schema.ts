@@ -162,6 +162,53 @@ export type Me = {
   activeAlertLimit: number
 }
 
+/** 수집 등급. 관심 등록과 알림이 많고 자주 바뀌는 아이템일수록 자주 수집한다 */
+export type CollectionTier = 'HOT' | 'NORMAL' | 'COLD'
+
+/** 핵심 지표 (Figma 상태 화면 위 카드 4개). 측정값이 없으면 null */
+export type StatusMetrics = {
+  /** Hot 아이템 반영 지연 p95(초). 목표 30초 */
+  hotDelayP95Seconds: number | null
+  /** 같은 지표의 M1 기준선(모든 아이템을 같은 주기로 수집했을 때) */
+  hotDelayBaselineSeconds: number | null
+  /** 호출 효율: 새 값을 받은 호출 비율(%) */
+  callEfficiencyPercent: number | null
+  callEfficiencyBaselinePercent: number | null
+  /** 최근 30일 API 호출 한도(분당 100회) 초과 횟수 */
+  rateLimitExceededCount: number
+  /** 목표가 알림 발송 지연 p95(초). 목표 60초 */
+  alertDelayP95Seconds: number | null
+  /** 최근 30일 중복 발송 수 */
+  duplicateAlertCount: number
+}
+
+export type TierStatus = {
+  tier: CollectionTier
+  itemCount: number
+  intervalSeconds: number
+  avgDelaySeconds: number | null
+}
+
+export type Incident = {
+  id: number
+  title: string
+  startedAt: string
+  /** 진행 중이면 null */
+  durationMinutes: number | null
+  description: string
+  resolved: boolean
+}
+
+/** GET /api/status (F12, D30) */
+export type ServiceHealth = {
+  serviceStatus: ServiceStatus
+  updatedAt: string
+  metrics: StatusMetrics
+  tiers: TierStatus[]
+  /** 최근 30일, 최신순 */
+  incidents: Incident[]
+}
+
 /** GET /api/me/watch-items의 한 항목 (메인 "내 관심 아이템" 카드) */
 export type WatchItem = {
   item: {

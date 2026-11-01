@@ -1,6 +1,8 @@
 import { RequireLogin } from '@/features/auth/components/require-login'
 import { AccountCard } from '@/features/settings/components/account-card'
+import { DeleteAccountCard } from '@/features/settings/components/delete-account-card'
 import { DmTestCard } from '@/features/settings/components/dm-test-card'
+import { NotificationSettingsCard } from '@/features/settings/components/notification-settings-card'
 
 /** 설정 (/settings, 로그인 필요). Figma "Settings /settings" */
 function SettingsPage() {
@@ -18,6 +20,8 @@ function SettingsPage() {
           <>
             <AccountCard me={me} />
             <DmTestCard me={me} />
+            <NotificationSettingsCard me={me} />
+            <DeleteAccountCard />
           </>
         )}
       </RequireLogin>

@@ -1,5 +1,7 @@
 import { FreshnessStrip } from '@/features/market/components/freshness-strip'
 import { RankingBoard } from '@/features/market/components/ranking-board'
+import { WatchListSection } from '@/features/watch/components/watch-list-section'
+
 /** 메인 (/). 수집 신선도 띠, 급등락 랭킹(2단계), 내 관심 아이템(4단계) */
 function HomePage() {
   return (
@@ -16,6 +18,7 @@ function HomePage() {
           </div>
           <RankingBoard />
         </div>
+        <WatchListSection />
       </div>
     </>
   )

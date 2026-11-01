@@ -1,5 +1,6 @@
-import { QueryClient } from '@tanstack/react-query'
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query'
 import { ApiError } from '@/api/client'
+import { notifyUnauthorized } from './auth-events'
 
 const MAX_RETRIES = 2
 
@@ -13,13 +14,24 @@ export function shouldRetry(failureCount: number, error: unknown): boolean {
   return error.isNetworkError || error.isServerError
 }
 
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: shouldRetry,
-      // 시세는 SSE로 갱신하므로(2단계) 창으로 돌아올 때마다 다시 받지 않는다
-      refetchOnWindowFocus: false,
+/** 로그인이 필요한 API가 401을 돌려주면 로그인 안내를 띄운다 (05-api "오류") */
+export function handleUnauthorized(error: unknown) {
+  if (error instanceof ApiError && error.status === 401) notifyUnauthorized()
+}
+
+export function createQueryClient() {
+  return new QueryClient({
+    queryCache: new QueryCache({ onError: handleUnauthorized }),
+    mutationCache: new MutationCache({ onError: handleUnauthorized }),
+    defaultOptions: {
+      queries: {
+        retry: shouldRetry,
+        // 시세는 SSE로 갱신하므로(2단계) 창으로 돌아올 때마다 다시 받지 않는다
+        refetchOnWindowFocus: false,
+      },
+      mutations: { retry: false },
     },
-    mutations: { retry: false },
-  },
-})
+  })
+}
+
+export const queryClient = createQueryClient()

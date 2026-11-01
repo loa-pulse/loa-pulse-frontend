@@ -139,3 +139,25 @@ export type CollectionSummary = {
   apiCallsLimit: number
   measuredAt: string
 }
+
+/**
+ * DM 수신 상태 (기획 4.4 "DM 실패 대비책").
+ * 아직 확인하지 않음, 정상, 서버를 나감, 서버 멤버 DM을 막음
+ */
+export type DmStatus = 'UNKNOWN' | 'OK' | 'LEFT_GUILD' | 'DM_BLOCKED'
+
+/** GET /api/me. 로그인하지 않았으면 401 (M3 필드 요약 기준) */
+export type Me = {
+  discordId: string
+  nickname: string
+  avatarUrl: string | null
+  joinedAt: string
+  /** LoaPulse 디스코드 서버 참여 여부 */
+  guildMember: boolean
+  dmStatus: DmStatus
+  lastDmTestAt: string | null
+  /** 급변동 알림 구독 (F11) */
+  surgeAlertSubscribed: boolean
+  activeAlertCount: number
+  activeAlertLimit: number
+}

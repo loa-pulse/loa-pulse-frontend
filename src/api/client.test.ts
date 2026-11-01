@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { server } from '@/mocks/server'
 import { ApiError, apiGet, apiRequest, apiUrl } from './client'
+import { readCsrfToken } from './csrf'
 
 describe('apiUrl', () => {
   it('비어 있는 쿼리 값은 빼고 붙인다', () => {
@@ -81,5 +82,42 @@ describe('apiRequest', () => {
       ),
     )
     await expect(apiRequest('DELETE', '/api/alerts/1')).resolves.toBeUndefined()
+  })
+})
+
+describe('CSRF', () => {
+  afterEach(() => {
+    document.cookie = 'XSRF-TOKEN=; max-age=0'
+  })
+
+  it('변경 요청에는 XSRF-TOKEN 쿠키 값을 X-XSRF-TOKEN 헤더로 보낸다', async () => {
+    document.cookie = 'XSRF-TOKEN=abc%3D123'
+    let header: string | null = null
+    server.use(
+      http.post('/api/alerts', ({ request }) => {
+        header = request.headers.get('X-XSRF-TOKEN')
+        return HttpResponse.json({ id: 1 })
+      }),
+    )
+    await apiRequest('POST', '/api/alerts', { body: {} })
+    expect(header).toBe('abc=123')
+  })
+
+  it('조회 요청에는 붙이지 않는다', async () => {
+    document.cookie = 'XSRF-TOKEN=abc'
+    let header: string | null = 'unset'
+    server.use(
+      http.get('/api/ping', ({ request }) => {
+        header = request.headers.get('X-XSRF-TOKEN')
+        return HttpResponse.json({})
+      }),
+    )
+    await apiGet('/api/ping')
+    expect(header).toBeNull()
+  })
+
+  it('쿠키 문자열에서 토큰만 읽는다', () => {
+    expect(readCsrfToken('a=1; XSRF-TOKEN=t%2B1; b=2')).toBe('t+1')
+    expect(readCsrfToken('a=1')).toBeNull()
   })
 })

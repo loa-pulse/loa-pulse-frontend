@@ -10,6 +10,9 @@ beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
 afterEach(() => {
   cleanup()
   server.resetHandlers()
+  // 목업 계정(로그인, 알림)은 저장소에 남으므로 테스트마다 비운다
+  localStorage.clear()
+  document.cookie = 'XSRF-TOKEN=; max-age=0; path=/'
 })
 
 afterAll(() => server.close())

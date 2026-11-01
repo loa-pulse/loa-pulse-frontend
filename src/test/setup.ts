@@ -4,6 +4,13 @@ import { cleanup } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll } from 'vitest'
 import { server } from '@/mocks/server'
 
+// jsdom에는 ResizeObserver가 없다. Radix 라디오·체크박스가 크기를 재려고 쓰므로 빈 구현을 둔다
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 // 목업에 없는 API를 부르면 테스트가 실패하게 해서, 목업과 화면이 어긋나는 것을 잡는다
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }))
 

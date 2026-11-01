@@ -1,3 +1,4 @@
+import { CSRF_COOKIE, readCsrfToken } from '@/api/csrf'
 import type { DmStatus, Me } from '@/api/schema'
 
 /**
@@ -38,8 +39,10 @@ export const mockAccount = {
   update(patch: Partial<AccountState>) {
     save({ ...load(), ...patch })
   },
+  /** 실제 로그인 응답처럼 세션과 함께 CSRF 쿠키가 생긴다 */
   logIn() {
     this.update({ loggedIn: true })
+    issueCsrfCookie()
   },
   /** 로그아웃해도 설정은 남는다. 회원 탈퇴는 reset */
   logOut() {
@@ -51,6 +54,13 @@ export const mockAccount = {
 }
 
 export const MOCK_CSRF_TOKEN = 'mock-csrf-token'
+
+/** Spring Security처럼 XSRF-TOKEN 쿠키를 내려준다 */
+export function issueCsrfCookie() {
+  if (readCsrfToken() !== MOCK_CSRF_TOKEN) {
+    document.cookie = `${CSRF_COOKIE}=${MOCK_CSRF_TOKEN}; path=/`
+  }
+}
 
 export function mockMe(activeAlertCount: number): Me {
   const state = load()

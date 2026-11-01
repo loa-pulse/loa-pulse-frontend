@@ -1,5 +1,6 @@
 import { AlertRowActions } from '@/features/alerts/components/alert-row-actions'
 import { AlertUsage } from '@/features/alerts/components/alert-usage'
+import { NotificationHistory } from '@/features/alerts/components/notification-history'
 import { RegisteredAlerts } from '@/features/alerts/components/registered-alerts'
 import { RequireLogin } from '@/features/auth/components/require-login'
 import { useAuth } from '@/features/auth/queries'
@@ -28,9 +29,12 @@ function AlertsPage() {
         </div>
         <RequireLogin description="로그인하면 등록한 알림과 받은 알림 내역을 볼 수 있어요">
           {() => (
-            <RegisteredAlerts
-              renderActions={(alert) => <AlertRowActions alert={alert} />}
-            />
+            <>
+              <RegisteredAlerts
+                renderActions={(alert) => <AlertRowActions alert={alert} />}
+              />
+              <NotificationHistory />
+            </>
           )}
         </RequireLogin>
       </div>

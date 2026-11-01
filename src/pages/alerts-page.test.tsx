@@ -139,4 +139,25 @@ describe('내 알림 화면', () => {
       screen.getByRole('link', { name: '시세 보러 가기' }),
     ).toHaveAttribute('href', '/items')
   })
+
+  it('받은 알림 내역과 DM 실패를 보여준다', async () => {
+    mockAccount.logIn()
+    renderPage()
+    const history = await screen.findByRole('region', {
+      name: /받은 알림 내역/,
+    })
+
+    expect(
+      await within(history).findByText(
+        '유물 질량 증가 각인서가 78,799 G가 됐어요',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      within(history).getByText(
+        '조건 105,000 G 이하 · DM 실패 → 웹으로만 표시',
+      ),
+    ).toHaveClass('text-status-warning')
+    // 2026-10-31T05:32Z = KST 14:32
+    expect(within(history).getByText('10월 31일 14:32')).toBeInTheDocument()
+  })
 })

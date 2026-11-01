@@ -2,7 +2,11 @@ import { QueryClient } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ItemDetail, ItemPrices, ItemSummary, Page } from '@/api/schema'
 import { marketKeys } from '@/features/market/queries'
-import { applyFreshnessEvent, applyPriceEvent } from './cache-updates'
+import {
+  applyFreshnessEvent,
+  applyPriceEvent,
+  applyRankingEvent,
+} from './cache-updates'
 
 const ID = 66102007
 const listKey = marketKeys.items({ category: 'refining', page: 1 })
@@ -95,6 +99,23 @@ describe('applyPriceEvent', () => {
       { time: '2026-11-01T05:30:00.000Z', price: 829 },
       { time: '2026-11-01T05:31:00.000Z', price: 812 },
     ])
+  })
+})
+
+describe('applyRankingEvent', () => {
+  const rankings = (calculatedAt: string) => ({
+    rising: [],
+    falling: [],
+    calculatedAt,
+  })
+
+  it('새 계산 결과로 바꾸고, 더 오래된 결과는 무시한다', () => {
+    applyRankingEvent(queryClient, rankings('2026-11-01T05:31:00Z'))
+    applyRankingEvent(queryClient, rankings('2026-11-01T05:30:30Z'))
+    expect(
+      queryClient.getQueryData<{ calculatedAt: string }>(marketKeys.rankings())!
+        .calculatedAt,
+    ).toBe('2026-11-01T05:31:00Z')
   })
 })
 

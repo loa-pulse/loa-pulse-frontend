@@ -1,7 +1,10 @@
+import { ClockIcon } from 'lucide-react'
 import { QueryError } from '@/components/query-error'
 import { Skeleton } from '@/components/ui/skeleton'
+import { IncidentList } from '@/features/status/components/incident-list'
 import { MetricCards } from '@/features/status/components/metric-cards'
 import { StatusOverview } from '@/features/status/components/status-overview'
+import { TierTable } from '@/features/status/components/tier-table'
 import { useServiceHealth } from '@/features/status/queries'
 
 /** 서비스 상태 (/status, F12). Figma "Status /status". 로그인 없이 본다 */
@@ -41,7 +44,21 @@ function StatusPage() {
           </div>
         )}
 
-        {health.data && <MetricCards metrics={health.data.metrics} />}
+        {health.data && (
+          <>
+            <MetricCards metrics={health.data.metrics} />
+            <div className="grid grid-cols-2 gap-6">
+              <TierTable tiers={health.data.tiers} />
+              <IncidentList incidents={health.data.incidents} />
+            </div>
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <ClockIcon aria-hidden="true" className="size-3.5" />
+              측정 방법: 로스트아크 원본 값이 바뀐 시각부터 LoaPulse 화면에
+              반영된 시각까지를 재요. M1 기준선은 모든 아이템을 같은 주기로
+              수집했을 때의 값이에요.
+            </p>
+          </>
+        )}
       </div>
     </>
   )

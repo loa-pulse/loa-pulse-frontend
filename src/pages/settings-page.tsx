@@ -1,16 +1,25 @@
 import { RequireLogin } from '@/features/auth/components/require-login'
+import { AccountCard } from '@/features/settings/components/account-card'
+import { DmTestCard } from '@/features/settings/components/dm-test-card'
 
-/** 설정 (/settings, 로그인 필요). 디스코드 계정, DM 수신 확인, 알림 받기, 회원 탈퇴 */
+/** 설정 (/settings, 로그인 필요). Figma "Settings /settings" */
 function SettingsPage() {
   return (
-    <div className="mx-auto max-w-[720px]">
+    <div className="mx-auto flex max-w-[720px] flex-col gap-6">
       <title>설정 · LoaPulse</title>
-      <h1 className="text-[28px] leading-9 font-bold">설정</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        디스코드 계정과 알림 수신 방법을 관리해요
-      </p>
+      <div className="mb-2">
+        <h1 className="text-[28px] leading-9 font-bold">설정</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          디스코드 계정과 알림 수신 방법을 관리해요
+        </p>
+      </div>
       <RequireLogin description="로그인하면 디스코드 계정과 알림 수신 방법을 관리할 수 있어요">
-        {() => null}
+        {(me) => (
+          <>
+            <AccountCard me={me} />
+            <DmTestCard me={me} />
+          </>
+        )}
       </RequireLogin>
     </div>
   )

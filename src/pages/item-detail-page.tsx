@@ -14,6 +14,7 @@ import { itemCaption } from '@/features/market/item-display'
 import { useItem } from '@/features/market/queries'
 import { RealtimeIndicator } from '@/features/realtime/components/realtime-indicator'
 import { useRealtimeSubscription } from '@/features/realtime/realtime-context'
+import { WatchToggle } from '@/features/watch/components/watch-toggle'
 import { useNow } from '@/lib/use-now'
 
 function DetailSkeleton() {
@@ -105,6 +106,12 @@ function ItemDetailPage() {
                 </p>
               </div>
               <div className="ml-auto flex gap-2">
+                <WatchToggle
+                  variant="button"
+                  itemId={itemId}
+                  itemName={item.data.name}
+                  watched={item.data.watched}
+                />
                 <Button
                   variant="secondary"
                   size="lg"

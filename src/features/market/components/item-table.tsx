@@ -17,6 +17,7 @@ const columns = [
   { label: '전일 대비', className: 'w-30 text-right' },
   { label: '최근 1시간', className: 'w-30 text-right' },
   { label: '마지막 갱신', className: 'w-30 text-right' },
+  { label: '관심', className: 'w-14 text-center' },
   { label: '', className: 'w-10' },
 ]
 
@@ -57,6 +58,7 @@ function SkeletonRow({ index }: { index: number }) {
       <TableCell>
         <Skeleton className="ml-auto h-5 w-14" />
       </TableCell>
+      <TableCell />
       <TableCell />
     </TableRow>
   )

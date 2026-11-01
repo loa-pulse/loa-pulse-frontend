@@ -4,6 +4,7 @@ import type { ItemSummary } from '@/api/schema'
 import { ItemThumb } from '@/components/item-thumb'
 import { PriceChange } from '@/components/price-change'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { WatchToggle } from '@/features/watch/components/watch-toggle'
 import { formatGold } from '@/lib/format/number'
 import { formatRelativeTime } from '@/lib/format/time'
 import { cn } from '@/lib/utils'
@@ -64,6 +65,13 @@ export function ItemTableRow({ item, now }: ItemTableRowProps) {
         <time dateTime={item.refreshedAt}>
           {formatRelativeTime(item.refreshedAt, now)}
         </time>
+      </TableCell>
+      <TableCell className="text-center">
+        <WatchToggle
+          itemId={item.id}
+          itemName={item.name}
+          watched={item.watched}
+        />
       </TableCell>
       <TableCell className="w-10 pr-4">
         <ChevronRightIcon

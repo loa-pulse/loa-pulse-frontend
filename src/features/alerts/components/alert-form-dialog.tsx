@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -50,9 +49,29 @@ type AlertFormDialogProps = {
 export function AlertFormDialog({
   open,
   onOpenChange,
+  ...props
+}: AlertFormDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[440px] gap-6 p-6">
+        {/* 닫으면 내용이 사라지므로 열 때마다 새 값으로 시작한다 */}
+        <AlertFormBody {...props} onClose={() => onOpenChange(false)} />
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+/**
+ * 모달 본문. 연 시점의 현재가로 기본 기준가를 정한다.
+ * 모달이 열린 동안 실시간 가격이 바뀌어도 입력 중인 값은 그대로 둔다.
+ */
+function AlertFormBody({
   item,
   editing,
-}: AlertFormDialogProps) {
+  onClose,
+}: Omit<AlertFormDialogProps, 'open' | 'onOpenChange'> & {
+  onClose: () => void
+}) {
   const create = useCreateAlert()
   const update = useUpdateAlert()
   const days = useDailyPrices(item.id)
@@ -60,12 +79,7 @@ export function AlertFormDialog({
     resolver: zodResolver(alertFormSchema),
     defaultValues: defaultAlertValues(item.currentPrice, editing),
   })
-  const { reset, setError, handleSubmit } = form
-
-  // 열 때마다 새 값으로 시작한다 (닫았다 다시 열면 이전 입력을 지운다)
-  useEffect(() => {
-    if (open) reset(defaultAlertValues(item.currentPrice, editing))
-  }, [open, item.currentPrice, editing, reset])
+  const { setError, handleSubmit } = form
 
   const pending = create.isPending || update.isPending
 
@@ -76,7 +90,7 @@ export function AlertFormDialog({
         toast.success(editing ? '알림을 수정했어요' : '알림을 등록했어요', {
           description: `${item.name} · ${formatGold(body.threshold)} ${body.direction === 'BELOW' ? '이하' : '이상'}`,
         })
-        onOpenChange(false)
+        onClose()
       },
       onError: (error: Error) => {
         if (error instanceof ApiError && error.status === 401) return // 로그인 안내가 뜬다
@@ -98,69 +112,58 @@ export function AlertFormDialog({
   })
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[440px] gap-6 p-6">
-        <DialogHeader className="flex-row items-center gap-3">
-          <ItemThumb
-            name={item.name}
-            grade={item.grade}
-            iconUrl={item.iconUrl}
-          />
-          <div className="flex flex-col gap-0.5 text-left">
-            <DialogTitle className="text-lg font-bold">
-              {editing ? '알림 수정' : '목표가 알림'}
-            </DialogTitle>
-            <DialogDescription>{item.name}</DialogDescription>
-          </div>
-        </DialogHeader>
-
-        <div className="flex items-center justify-between rounded-lg bg-background px-4 py-3">
-          <span className="text-[13px] text-muted-foreground">현재가</span>
-          <span className="flex items-center gap-2">
-            <span className="text-lg font-bold tabular-nums">
-              {formatGold(item.currentPrice)}
-            </span>
-            {item.changeRate !== undefined && (
-              <PriceChange rate={item.changeRate} />
-            )}
-          </span>
+    <>
+      <DialogHeader className="flex-row items-center gap-3">
+        <ItemThumb name={item.name} grade={item.grade} iconUrl={item.iconUrl} />
+        <div className="flex flex-col gap-0.5 text-left">
+          <DialogTitle className="text-lg font-bold">
+            {editing ? '알림 수정' : '목표가 알림'}
+          </DialogTitle>
+          <DialogDescription>{item.name}</DialogDescription>
         </div>
+      </DialogHeader>
 
-        <FormProvider {...form}>
-          <form
-            id="alert-form"
-            onSubmit={onSubmit}
-            noValidate
-            className="flex flex-col gap-6"
-          >
-            <AlertFormFields
-              currentPrice={item.currentPrice}
-              yesterdayAvgPrice={item.yesterdayAvgPrice ?? null}
-              days={days.data?.days}
-            />
-          </form>
-        </FormProvider>
+      <div className="flex items-center justify-between rounded-lg bg-background px-4 py-3">
+        <span className="text-[13px] text-muted-foreground">현재가</span>
+        <span className="flex items-center gap-2">
+          <span className="text-lg font-bold tabular-nums">
+            {formatGold(item.currentPrice)}
+          </span>
+          {item.changeRate !== undefined && (
+            <PriceChange rate={item.changeRate} />
+          )}
+        </span>
+      </div>
 
-        <p className="flex gap-2 rounded-lg bg-muted/60 px-3 py-2.5 text-xs text-muted-foreground">
-          <ClockIcon aria-hidden="true" className="mt-px size-3.5 shrink-0" />
-          조건을 만족하면 한 번만 보내고 '발송 완료'로 바뀌어요. 다시 받으려면
-          내 알림에서 다시 켜 주세요.
-        </p>
+      <FormProvider {...form}>
+        <form
+          id="alert-form"
+          onSubmit={onSubmit}
+          noValidate
+          className="flex flex-col gap-6"
+        >
+          <AlertFormFields
+            currentPrice={item.currentPrice}
+            yesterdayAvgPrice={item.yesterdayAvgPrice ?? null}
+            days={days.data?.days}
+          />
+        </form>
+      </FormProvider>
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="ghost"
-            size="lg"
-            onClick={() => onOpenChange(false)}
-          >
-            취소
-          </Button>
-          <Button type="submit" form="alert-form" size="lg" disabled={pending}>
-            {editing ? '저장' : '알림 등록'}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <p className="flex gap-2 rounded-lg bg-muted/60 px-3 py-2.5 text-xs text-muted-foreground">
+        <ClockIcon aria-hidden="true" className="mt-px size-3.5 shrink-0" />
+        조건을 만족하면 한 번만 보내고 '발송 완료'로 바뀌어요. 다시 받으려면 내
+        알림에서 다시 켜 주세요.
+      </p>
+
+      <DialogFooter>
+        <Button type="button" variant="ghost" size="lg" onClick={onClose}>
+          취소
+        </Button>
+        <Button type="submit" form="alert-form" size="lg" disabled={pending}>
+          {editing ? '저장' : '알림 등록'}
+        </Button>
+      </DialogFooter>
+    </>
   )
 }

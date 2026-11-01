@@ -19,15 +19,19 @@ export function handleUnauthorized(error: unknown) {
   if (error instanceof ApiError && error.status === 401) notifyUnauthorized()
 }
 
-export const queryClient = new QueryClient({
-  queryCache: new QueryCache({ onError: handleUnauthorized }),
-  mutationCache: new MutationCache({ onError: handleUnauthorized }),
-  defaultOptions: {
-    queries: {
-      retry: shouldRetry,
-      // 시세는 SSE로 갱신하므로(2단계) 창으로 돌아올 때마다 다시 받지 않는다
-      refetchOnWindowFocus: false,
+export function createQueryClient() {
+  return new QueryClient({
+    queryCache: new QueryCache({ onError: handleUnauthorized }),
+    mutationCache: new MutationCache({ onError: handleUnauthorized }),
+    defaultOptions: {
+      queries: {
+        retry: shouldRetry,
+        // 시세는 SSE로 갱신하므로(2단계) 창으로 돌아올 때마다 다시 받지 않는다
+        refetchOnWindowFocus: false,
+      },
+      mutations: { retry: false },
     },
-    mutations: { retry: false },
-  },
-})
+  })
+}
+
+export const queryClient = createQueryClient()

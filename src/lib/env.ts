@@ -11,4 +11,6 @@
 export const env = {
   apiBaseUrl: (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, ''),
   useMock: import.meta.env.VITE_USE_MOCK === 'true',
+  /** LoaPulse 디스코드 서버 초대 링크. 서버를 나간 사용자에게 보여준다 (기획 4.4) */
+  discordInviteUrl: import.meta.env.VITE_DISCORD_INVITE_URL || null,
 }

@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/header'
 import { Toaster } from '@/components/ui/sonner'
 import { AccountMenu } from '@/features/auth/components/account-menu'
 import { LoginPromptProvider } from '@/features/auth/login-prompt-provider'
+import { DmStatusBanner } from '@/features/settings/components/dm-status-banner'
 import { RealtimeIndicator } from '@/features/realtime/components/realtime-indicator'
 import { ServiceStatusBanner } from '@/features/realtime/components/service-status-banner'
 import { RealtimeProvider } from '@/features/realtime/realtime-provider'
@@ -22,6 +23,7 @@ function App() {
         />
         <ServiceStatusBanner />
         <main className="mx-auto w-full max-w-[1200px] px-6 pt-10 pb-20">
+          <DmStatusBanner />
           <Outlet />
         </main>
         <Toaster />

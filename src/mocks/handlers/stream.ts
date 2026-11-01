@@ -2,15 +2,23 @@ import { sse } from 'msw'
 import type { RankingEntry } from '@/api/schema'
 import type {
   FreshnessEvent,
+  NotificationEvent,
   PriceEvent,
   RankingEvent,
+  StreamEventType,
 } from '@/features/realtime/events'
+import { mockAccount } from '../data/account'
+import { mockAlerts } from '../data/alerts'
 import { findSeed, rankings } from '../data/market'
 
 /** 가격이 바뀌는 간격, freshness 간격(05-api: 10초), 랭킹 계산 간격(D12: 30초) */
 const PRICE_INTERVAL_MS = 4_000
 const FRESHNESS_INTERVAL_MS = 10_000
 const RANKING_INTERVAL_MS = 30_000
+/** 접속하고 이만큼 지나면 웹 알림 하나를 보낸다 */
+const NOTIFICATION_DELAY_MS = 15_000
+
+let notifiedOnce = false
 
 const round2 = (value: number) => Math.round(value * 100) / 100
 
@@ -31,7 +39,7 @@ export const streamHandlers = [
     const prices = new Map(seeds.map((s) => [s.id, s.currentPrice]))
     let tick = 0
 
-    const send = (event: 'price' | 'freshness' | 'ranking', data: unknown) =>
+    const send = (event: StreamEventType, data: unknown) =>
       client.send({ event, data: JSON.stringify(data) } as never)
 
     const sendFreshness = () => {
@@ -96,8 +104,32 @@ export const streamHandlers = [
       setInterval(sendFreshness, FRESHNESS_INTERVAL_MS),
     ]
     if (wantsRanking) timers.push(setInterval(sendRanking, RANKING_INTERVAL_MS))
-    request.signal.addEventListener('abort', () =>
-      timers.forEach((t) => clearInterval(t)),
-    )
+
+    // 로그인 사용자의 연결에는 웹 알림이 온다. 목업은 페이지마다 한 번만 보낸다
+    const notifyTimer = setTimeout(() => {
+      if (notifiedOnce || !mockAccount.get().loggedIn) return
+      const sent = mockAlerts.triggerOne()
+      if (!sent) return
+      notifiedOnce = true
+      const body: NotificationEvent = {
+        notificationId: sent.id,
+        alertId: sent.alertId,
+        item: {
+          id: sent.item.id,
+          name: sent.item.name,
+          iconUrl: sent.item.iconUrl,
+        },
+        price: sent.price,
+        direction: sent.direction,
+        threshold: sent.threshold,
+        createdAt: sent.createdAt,
+      }
+      send('notification', body)
+    }, NOTIFICATION_DELAY_MS)
+
+    request.signal.addEventListener('abort', () => {
+      timers.forEach((t) => clearInterval(t))
+      clearTimeout(notifyTimer)
+    })
   }),
 ]

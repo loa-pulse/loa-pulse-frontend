@@ -6,9 +6,11 @@ import {
   useState,
   type ReactNode,
 } from 'react'
+import { useNavigate } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ServiceStatus } from '@/api/schema'
 import { apiUrl } from '@/api/client'
+import { applyNotificationEvent } from '@/features/alerts/notification-toast'
 import {
   applyFreshnessEvent,
   applyPriceEvent,
@@ -47,6 +49,7 @@ function toStreamQuery(subscriptions: Iterable<Subscription>): string {
  */
 export function RealtimeProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const tabActive = useTabActive()
   const subscriptions = useRef(new Map<number, Subscription>())
   const nextId = useRef(0)
@@ -82,11 +85,16 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
           case 'ranking':
             applyRankingEvent(queryClient, event.data)
             break
+          case 'notification':
+            applyNotificationEvent(queryClient, event.data, (itemId) =>
+              navigate(`/items/${itemId}`),
+            )
+            break
         }
       },
     })
     return () => connection.close()
-  }, [url, tabActive, queryClient])
+  }, [url, tabActive, queryClient, navigate])
 
   // 탭을 오래 비워 연결을 끊은 동안은 연결 끊김으로 보여준다
   const shownState: StreamState = tabActive ? state : 'offline'

@@ -5,6 +5,8 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
   /** "true"면 MSW 목업으로 API와 SSE를 흉내 낸다 (로컬, Vercel 프리뷰) */
   readonly VITE_USE_MOCK?: string
+  /** LoaPulse 디스코드 서버 초대 링크 (서버 다시 참여 버튼) */
+  readonly VITE_DISCORD_INVITE_URL?: string
 }
 
 interface ImportMeta {

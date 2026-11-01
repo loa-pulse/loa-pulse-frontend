@@ -162,6 +162,17 @@ export type Me = {
   activeAlertLimit: number
 }
 
+/** PATCH /api/me/settings 요청. 응답은 바뀐 Me */
+export type SettingsRequest = {
+  surgeAlertSubscribed: boolean
+}
+
+/** POST /api/me/dm-test 응답 */
+export type DmTestResult = {
+  dmStatus: DmStatus
+  testedAt: string
+}
+
 /** 이하가 되면 / 이상이 되면 */
 export type AlertDirection = 'BELOW' | 'ABOVE'
 

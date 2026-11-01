@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import type { DmTestResult, SettingsRequest } from '@/api/schema'
 import { issueCsrfCookie, mockAccount, mockMe } from '../data/account'
 import { mockAlerts } from '../data/alerts'
 import { guard } from './guards'
@@ -17,6 +18,38 @@ export const authHandlers = [
     const denied = guard(request)
     if (denied) return denied
     mockAccount.logOut()
+    return new HttpResponse(null, { status: 204 })
+  }),
+
+  http.patch('*/api/me/settings', async ({ request }) => {
+    const denied = guard(request)
+    if (denied) return denied
+    const body = (await request.json()) as SettingsRequest
+    mockAccount.update({ surgeAlertSubscribed: body.surgeAlertSubscribed })
+    return HttpResponse.json(mockMe(mockAlerts.activeCount()))
+  }),
+
+  /** 목업의 테스트 DM은 언제나 도착한다. 실패 화면은 테스트에서 상태를 바꿔 본다 */
+  http.post('*/api/me/dm-test', ({ request }) => {
+    const denied = guard(request)
+    if (denied) return denied
+    const result: DmTestResult = {
+      dmStatus: 'OK',
+      testedAt: new Date().toISOString(),
+    }
+    mockAccount.update({
+      dmStatus: result.dmStatus,
+      lastDmTestAt: result.testedAt,
+    })
+    return HttpResponse.json(result)
+  }),
+
+  /** 탈퇴하면 계정과 알림을 바로 지운다 (D19) */
+  http.delete('*/api/me', ({ request }) => {
+    const denied = guard(request)
+    if (denied) return denied
+    mockAccount.reset()
+    mockAlerts.reset()
     return new HttpResponse(null, { status: 204 })
   }),
 ]

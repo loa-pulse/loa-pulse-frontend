@@ -13,4 +13,6 @@ export const env = {
   useMock: import.meta.env.VITE_USE_MOCK === 'true',
   /** LoaPulse 디스코드 서버 초대 링크. 서버를 나간 사용자에게 보여준다 (기획 4.4) */
   discordInviteUrl: import.meta.env.VITE_DISCORD_INVITE_URL || null,
+  /** 상태 화면에 임베드할 Grafana 공개 대시보드 주소 (D22, D30) */
+  grafanaDashboardUrl: import.meta.env.VITE_GRAFANA_DASHBOARD_URL || null,
 }

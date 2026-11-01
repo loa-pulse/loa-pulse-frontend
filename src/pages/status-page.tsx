@@ -1,6 +1,7 @@
 import { ClockIcon } from 'lucide-react'
 import { QueryError } from '@/components/query-error'
 import { Skeleton } from '@/components/ui/skeleton'
+import { GrafanaPanel } from '@/features/status/components/grafana-panel'
 import { IncidentList } from '@/features/status/components/incident-list'
 import { MetricCards } from '@/features/status/components/metric-cards'
 import { StatusOverview } from '@/features/status/components/status-overview'
@@ -47,6 +48,7 @@ function StatusPage() {
         {health.data && (
           <>
             <MetricCards metrics={health.data.metrics} />
+            <GrafanaPanel />
             <div className="grid grid-cols-2 gap-6">
               <TierTable tiers={health.data.tiers} />
               <IncidentList incidents={health.data.incidents} />

@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_USE_MOCK?: string
   /** LoaPulse 디스코드 서버 초대 링크 (서버 다시 참여 버튼) */
   readonly VITE_DISCORD_INVITE_URL?: string
+  /** Grafana 공개 대시보드 주소 (상태 화면 임베드) */
+  readonly VITE_GRAFANA_DASHBOARD_URL?: string
 }
 
 interface ImportMeta {

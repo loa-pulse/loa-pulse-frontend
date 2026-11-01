@@ -161,3 +161,62 @@ export type Me = {
   activeAlertCount: number
   activeAlertLimit: number
 }
+
+/** 이하가 되면 / 이상이 되면 */
+export type AlertDirection = 'BELOW' | 'ABOVE'
+
+/** 활성, 일시정지, 발송 완료(1회성, 기획 4.2) */
+export type AlertStatus = 'ACTIVE' | 'PAUSED' | 'TRIGGERED'
+
+/** 받을 곳 */
+export type AlertChannels = { dm: boolean; web: boolean }
+
+/** 알림·내역에 함께 오는 아이템 요약 */
+export type AlertItem = {
+  id: number
+  name: string
+  grade: string
+  iconUrl: string | null
+}
+
+export type Alert = {
+  id: number
+  item: AlertItem & { currentPrice: number | null }
+  direction: AlertDirection
+  threshold: number
+  channels: AlertChannels
+  status: AlertStatus
+  /** 발송 시각. 발송 전이면 null */
+  triggeredAt: string | null
+  createdAt: string
+}
+
+/** GET /api/alerts?status=&itemId= */
+export type AlertList = {
+  items: Alert[]
+  counts: { all: number; active: number; paused: number; triggered: number }
+  activeLimit: number
+}
+
+/** POST /api/alerts, PATCH /api/alerts/{alertId} 요청 */
+export type AlertRequest = {
+  itemId: number
+  direction: AlertDirection
+  threshold: number
+  channels: AlertChannels
+}
+
+/** GET /api/notifications. 받은 알림 내역, 최근 30일 (F10) */
+export type Notification = {
+  id: number
+  alertId: number
+  item: AlertItem
+  /** 발송 당시 가격 */
+  price: number
+  direction: AlertDirection
+  threshold: number
+  /** DM 결과. DM을 받을 곳으로 고르지 않았으면 null */
+  dm: 'SENT' | 'FAILED' | null
+  web: boolean
+  createdAt: string
+}

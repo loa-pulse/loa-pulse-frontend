@@ -34,22 +34,28 @@ pnpm dev
 
 `.env.example`을 `.env.local`로 복사해서 쓴다.
 
-| 변수                | 내용                                                                  |
-| ------------------- | --------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | 백엔드 주소. 비우면 같은 출처의 `/api`. 운영은 `https://api.{도메인}` |
-| `VITE_USE_MOCK`     | `true`면 MSW 목업으로 API와 SSE를 흉내 낸다 (백엔드 없이 화면 확인)   |
+| 변수                      | 내용                                                                     |
+| ------------------------- | ------------------------------------------------------------------------ |
+| `VITE_API_BASE_URL`       | 백엔드 주소. 비우면 같은 출처의 `/api`. 운영은 `https://api.{도메인}`    |
+| `VITE_USE_MOCK`           | `true`면 MSW 목업으로 API와 SSE를 흉내 낸다 (백엔드 없이 화면 확인)      |
+| `VITE_DISCORD_INVITE_URL` | LoaPulse 디스코드 서버 초대 링크 (서버를 나간 사용자의 "서버 다시 참여") |
+
+### 목업으로 둘러보기
+
+`VITE_USE_MOCK=true`면 로그인도 목업이다. "디스코드로 로그인"을 누르면 디스코드를 거치지 않고 바로 로그인된다. 로그인 상태와 알림은 브라우저 저장소(`loapulse.mock.*`)에 남으므로, 처음 상태로 돌아가려면 저장소를 지우거나 설정에서 탈퇴한다. 로그인한 채로 15초쯤 있으면 웹 알림 토스트가 한 번 온다.
 
 ## 스크립트
 
-| 명령                                | 내용                      |
-| ----------------------------------- | ------------------------- |
-| `pnpm dev`                          | 개발 서버                 |
-| `pnpm build`                        | 타입 검사 후 빌드         |
-| `pnpm test` / `pnpm test:watch`     | Vitest 실행 / 감시 모드   |
-| `pnpm lint`                         | ESLint                    |
-| `pnpm format` / `pnpm format:check` | Prettier 서식 적용 / 검사 |
+| 명령                                | 내용                                                                                                 |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                          | 개발 서버                                                                                            |
+| `pnpm build`                        | 타입 검사 후 빌드                                                                                    |
+| `pnpm test` / `pnpm test:watch`     | Vitest 실행 / 감시 모드                                                                              |
+| `pnpm test:e2e`                     | Playwright E2E (목업 서버를 띄워 S1 시나리오 실행). 처음에는 `pnpm exec playwright install chromium` |
+| `pnpm lint`                         | ESLint                                                                                               |
+| `pnpm format` / `pnpm format:check` | Prettier 서식 적용 / 검사                                                                            |
 
-CI는 PR과 `main` push마다 `lint`, `format:check`, `test`, `build`를 실행한다.
+CI는 PR과 `main` push마다 `lint`, `format:check`, `test`, `build`, `test:e2e`를 실행한다.
 
 ## 배포 (Vercel)
 

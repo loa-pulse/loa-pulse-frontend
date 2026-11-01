@@ -20,6 +20,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // e2e/는 Playwright가 실행한다
+    include: ['src/**/*.test.{ts,tsx}'],
     // 날짜 표시는 KST 기준이므로, 실행 환경의 시간대와 상관없이 같은 결과를 내도록 고정한다
     env: { TZ: 'UTC' },
     passWithNoTests: true,

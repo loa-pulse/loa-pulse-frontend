@@ -28,3 +28,13 @@ jobs:
       - run: pnpm test
       # 타입 검사(tsc -b)와 번들 빌드
       - run: pnpm build
+
+      # E2E: 목업 서버 위에서 S1 메인 시나리오 (04-testing 5절)
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7

@@ -269,6 +269,42 @@ export const mockAlerts = {
 
   notifications: () => load().notifications,
 
+  /**
+   * 웹으로 받는 활성 알림 하나가 조건을 만족한 것처럼 발송한다 (SSE 목업용).
+   * 알림은 '발송 완료'가 되고 받은 알림 내역에 남는다. 보낼 알림이 없으면 null.
+   */
+  triggerOne(): Notification | null {
+    const state = load()
+    const target = state.alerts.find(
+      (a) => a.status === 'ACTIVE' && a.channels.web,
+    )
+    if (!target) return null
+    const now = new Date().toISOString()
+    const price =
+      target.direction === 'BELOW' ? target.threshold - 1 : target.threshold + 1
+    const sent = notification(
+      Math.max(0, ...state.notifications.map((n) => n.id)) + 1,
+      target.id,
+      target.itemId,
+      price,
+      target.direction,
+      target.threshold,
+      target.channels.dm ? 'SENT' : null,
+      true,
+      now,
+    )
+    save({
+      ...state,
+      alerts: state.alerts.map((a) =>
+        a.id === target.id
+          ? { ...a, status: 'TRIGGERED', triggeredAt: now }
+          : a,
+      ),
+      notifications: [sent, ...state.notifications],
+    })
+    return sent
+  },
+
   reset() {
     localStorage.removeItem(STORAGE_KEY)
   },

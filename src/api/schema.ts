@@ -162,6 +162,22 @@ export type Me = {
   activeAlertLimit: number
 }
 
+/** GET /api/me/watch-items의 한 항목 (메인 "내 관심 아이템" 카드) */
+export type WatchItem = {
+  item: {
+    id: number
+    name: string
+    grade: string
+    categoryName: string
+    iconUrl: string | null
+  }
+  currentPrice: number | null
+  /** 전일 평균가 대비 변동률(%) */
+  changeRate: number | null
+  /** 오늘 추이. 시간별 최저가 점 (스파크라인) */
+  todayPoints: PricePoint[]
+}
+
 /** PATCH /api/me/settings 요청. 응답은 바뀐 Me */
 export type SettingsRequest = {
   surgeAlertSubscribed: boolean
